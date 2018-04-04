@@ -16,8 +16,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
  * @author Tyj
@@ -42,9 +42,12 @@ public class NettyServer {
             // 将两个 NIO 线程组传入辅助启动类中
             bootstrap.group(acceptorGroup, workGroup)
                 // 设置创建 Channel 的类型
-                .channel(ServerSocketChannel.class)
+                .channel(NioServerSocketChannel.class)
                 // 设置参数
                 .option(ChannelOption.SO_BACKLOG, 1024)
+                // option()是提供给NioServerSocketChannel用来接收进来的连接
+                // childOption()是提供给由父管道ServerChannel接收到的连接
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
                 // 设置 IO 事件的处理类
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -56,10 +59,10 @@ public class NettyServer {
             // bind()绑定端口, sync() 同步等待绑定成功
             // ChannelFuture 主要用于异步操作的通知回调
             ChannelFuture future = bootstrap.bind(port).sync();
-            System.out.println("Server is already start in port 8080 !");
+            System.out.println("Server is starting in port 8080 !");
 
             // 等待服务端监听端口关闭
-            future.channel().close().sync();
+            future.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

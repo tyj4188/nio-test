@@ -7,9 +7,7 @@
  * 2018/3/22 - JOHN - 创建。
  */
 
-package com.nio.john;
-
-import com.nio.john.RSA.RSAUtils;
+package com.nio.john.RSA;
 
 import java.util.Map;
 
