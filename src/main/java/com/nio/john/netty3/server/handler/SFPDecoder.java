@@ -9,9 +9,12 @@
 
 package com.nio.john.netty3.server.handler;
 
+import com.nio.john.netty3.server.protocol.MessageCodec;
+import com.nio.john.util.MessageUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
@@ -21,9 +24,31 @@ import java.util.List;
  * @date 2018/4/11
  */
 public class SFPDecoder extends ByteToMessageDecoder {
+
+    private MessageCodec codec = new MessageCodec();
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         throws Exception {
-
+        try {
+            // 可读长度
+            int length = in.readableBytes();
+            byte[] bytes = new byte[length];
+            in.getBytes(in.readerIndex(), bytes, 0, length);
+            String msg = new String(bytes, in.readerIndex(), length);
+            if(StringUtils.isNotEmpty(msg)) {
+                // 判断是否是有效协议消息
+                if(MessageUtil.isNotSFP(msg)) {
+                    ctx.channel().pipeline().remove(this);
+                    return;
+                } else {
+                    out.add(codec.decode(msg));
+                    in.clear();
+                }
+            }
+        } catch (Exception e) {
+            ctx.channel().pipeline().remove(this);
+            e.printStackTrace();
+        }
     }
 }

@@ -9,6 +9,8 @@
 
 package com.nio.john.netty3.server.protocol;
 
+import com.nio.john.util.MessageUtil;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

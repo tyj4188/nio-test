@@ -11,14 +11,12 @@ package com.nio.john.netty3.server.processor;
 
 import com.nio.john.netty3.server.protocol.MessageCodec;
 import com.nio.john.netty3.server.protocol.MessageObject;
-import com.nio.john.netty3.server.protocol.MessageUtil;
+import com.nio.john.util.MessageUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
-
-import java.util.Date;
 
 /**
  * @author JOHN
@@ -65,7 +63,8 @@ public class MessageProcessor {
             if(channel == client) {
                 continue;
             }
-            this.sendMsg(channel, MessageObject.CMD.CHAT, msgObj.getNickName(), msgObj.getContent());
+            MessageUtil.sendMsg(channel, MessageObject.CMD.CHAT, msgObj.getNickName()
+                , msgObj.getContent(), codec);
         }
     }
 
@@ -75,14 +74,7 @@ public class MessageProcessor {
         users.add(client);
         for(Channel channel : users) {
             String content = channel == client ? "已与服务器建立连接" : msgObj.getNickName() + " 加入聊天室";
-            this.sendMsg(channel, MessageObject.CMD.SYSTEM, msgObj.getNickName(), content);
+            MessageUtil.sendMsg(channel, MessageObject.CMD.SYSTEM, msgObj.getNickName(), content, codec);
         }
-    }
-
-    private void sendMsg(Channel channel, MessageObject.CMD cmd, String nickName
-        , String content) {
-        MessageObject send = new MessageObject(cmd.getValue(), nickName,
-            new Date().getTime(), content, users.size());
-        channel.writeAndFlush(codec.encode(send));
     }
 }

@@ -9,8 +9,15 @@
 
 package com.nio.john.netty3.server;
 
+import com.nio.john.netty3.server.handler.SFPDecoder;
+import com.nio.john.netty3.server.handler.SFPEncoder;
+import com.nio.john.netty3.server.handler.SFPHandler;
+import com.nio.john.util.CONSTANT;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -20,8 +27,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  * @date 2018/4/11
  */
 public class ChatServer {
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception {
+        new ChatServer().bind(CONSTANT.port);
     }
 
     public void bind(int port) throws Exception {
@@ -44,11 +51,14 @@ public class ChatServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        // TODO 设置过滤器
+                        ch.pipeline().addLast(new SFPDecoder())
+                            .addLast(new SFPEncoder())
+                            .addLast(new SFPHandler());
                     }
                 });
             // 设置同步连接
             ChannelFuture future = bootstrap.bind(port).sync();
+            System.out.println("服务端启动 - 端口" + port);
             // 同步等待客户端关闭
             future.channel().closeFuture().sync();
         } finally {
