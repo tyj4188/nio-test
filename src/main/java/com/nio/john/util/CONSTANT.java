@@ -16,6 +16,6 @@ package com.nio.john.util;
 public class CONSTANT {
     public static final String host = "127.0.0.1";
 
-    public static final int port = 8080;
+    public static final int port = 9090;
 
 }

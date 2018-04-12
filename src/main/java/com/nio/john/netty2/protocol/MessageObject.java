@@ -47,6 +47,12 @@ public class MessageObject {
         this.content = content;
     }
 
+    public MessageObject(String cmd, long sendTime, String nickName, String content, int onlineCount) {
+        this(cmd, sendTime, nickName);
+        this.content = content;
+        this.onlineCount = onlineCount;
+    }
+
     public String getCmd() {
         return cmd;
     }

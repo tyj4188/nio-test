@@ -9,6 +9,7 @@
 
 package com.nio.john.netty2.handler;
 
+import com.nio.john.netty2.processor.MessageProcessor;
 import com.nio.john.netty2.protocol.MessageObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -18,7 +19,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
  * @date 2018/4/4
  */
 public class SFPHandler extends SimpleChannelInboundHandler<MessageObject> {
-    protected void messageReceived(ChannelHandlerContext ctx, MessageObject msg) throws Exception {
 
+    private MessageProcessor processor = new MessageProcessor();
+
+    @Override
+    protected void messageReceived(ChannelHandlerContext ctx, MessageObject msg) throws Exception {
+        processor.messageHandler(ctx.channel(), msg);
     }
 }
